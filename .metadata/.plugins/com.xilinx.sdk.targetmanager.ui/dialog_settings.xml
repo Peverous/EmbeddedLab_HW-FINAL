@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<item value="Local" key="Arty_BD_wrapper_hw_platform_0-target"/>
+	<item value="Arty_BD_wrapper_hw_platform_0" key="programfpga.hwplatform"/>
+	<item value="Auto Detect" key="Arty_BD_wrapper_hw_platform_0-device"/>
+	<item value="bootloop" key="Arty_BD_wrapper_hw_platform_0-Arty_BD_i/microblaze_0-initElf"/>
+	<item value="Arty_BD_wrapper.mmi" key="Arty_BD_wrapper_hw_platform_0-bmmFile"/>
+	<item value="Arty_BD_wrapper.bit" key="Arty_BD_wrapper_hw_platform_0-bitFile"/>
+</section>

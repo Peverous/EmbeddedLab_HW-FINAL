@@ -1,0 +1,103 @@
+/*
+ * Timer.c
+ *
+ *  Created on: 10 Íïå 2015
+ *      Author: stelkork
+ */
+#include "Timer.h"
+#include "Interrupts.h"
+
+void Timer_Init(XTmrCtr *TmrCtrInstancePtr, u8 TmrCtrNumber, u16 DeviceId)
+{
+
+	/*
+	 * Initialize the timer counter so that it's ready to use,
+	 * specify the device ID that is generated in xparameters.h
+	 */
+	XTmrCtr_Initialize(TmrCtrInstancePtr, DeviceId);
+
+	/*
+	 * Setup the handler for the timer counter that will be called from the
+	 * interrupt context when the timer expires, specify a pointer to the
+	 * timer counter driver instance as the callback reference so the handler
+	 * is able to access the instance data
+	 */
+	XTmrCtr_SetHandler(TmrCtrInstancePtr, TimerCounterHandler, TmrCtrInstancePtr);
+
+	/*
+	 * Enable the interrupt of the timer counter so interrupts will occur
+	 * and use auto reload mode such that the timer counter will reload
+	 * itself automatically and continue repeatedly, without this option
+	 * it would expire once only
+	 */
+	XTmrCtr_SetOptions(TmrCtrInstancePtr, TmrCtrNumber,	XTC_INT_MODE_OPTION | XTC_AUTO_RELOAD_OPTION);
+
+	/*
+	 * Set a reset value for the timer counter such that it will expire
+	 * eariler than letting it roll over from 0, the reset value is loaded
+	 * into the timer counter when it is started
+	 */
+	XTmrCtr_SetResetValue(TmrCtrInstancePtr, TmrCtrNumber, RESET_VALUE);
+
+	/*
+	 * Start the timer counter such that it's incrementing by default,
+	 * then wait for it to timeout a number of times
+	 */
+	XTmrCtr_Start(TmrCtrInstancePtr, TmrCtrNumber);
+
+}
+
+/*****************************************************************************/
+/**
+* This function is the handler which performs processing for the timer counter.
+* It is called from an interrupt context such that the amount of processing
+* performed should be minimized.  It is called when the timer counter expires
+* if interrupts are enabled.
+*
+* This handler provides an example of how to handle timer counter interrupts
+* but is application specific.
+*
+* @param	CallBackRef is a pointer to the callback function
+* @param	TmrCtrNumber is the number of the timer to which this
+*		handler is associated with.
+*
+* @return	None.
+*
+* @note		None.
+*
+******************************************************************************/
+//void TimerCounterHandler(void *CallBackRef, u8 TmrCtrNumber,int j,int second[],int N)
+void TimerCounterHandler(void *CallBackRef, u8 TmrCtrNumber)
+{
+
+	//int k,temp;
+	int * LED = XPAR_GPIO_0_BASEADDR;
+	static int led_value = 1;
+
+	//static int N=16;
+	static int j=0;
+	static int second[16]={15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0};
+	int k,temp;
+	led_value ^= 1;
+	*LED = led_value;
+
+	if(j<15){
+	for(k=0;k<15-j;k++)
+	    	{
+	    		if(second[k]>second[k+1])
+	    		{
+	    			temp=second[k];
+	    			second[k]=second[k+1];
+	    			second[k+1]=temp;
+	    		}
+	    	}
+
+	for(k=0;k<16-1;k++)
+	    {xil_printf("%d",second[k]);}
+	}
+	else{
+		return;
+	}
+	j++;
+	xil_printf("\n\r");
+}

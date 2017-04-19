@@ -1,0 +1,106 @@
+/*
+ * crc.c
+ *
+ *  Created on: Feb 11, 2017
+ *      Author: chris
+ */
+
+#include "crc.h"
+#include "Timer.h"
+#include "Interrupts.h"
+#include "UART.h"
+
+
+void crc_init() {
+	unsigned long remainder;
+	int dividend;
+	unsigned long bit;
+
+	for ( dividend = 0; dividend < 256; ++dividend)
+	{
+
+		remainder = dividend << (WIDTH - 8);
+
+
+		for ( bit = 8; bit > 0; --bit)
+		{
+			if (remainder & TOPBIT) {
+				remainder = (remainder << 1) ^ CRC_POLY;
+			}
+			else
+			{
+				remainder = (remainder << 1);
+			}
+		}
+		crcTable[dividend] = remainder;
+	}
+}
+
+void cacl_crc(u8 data)
+{
+	unsigned int n;
+	static int num=1;
+
+	for (n=0;n<sizeof(data);n++)
+	{
+		crc_final = (crc_final >> 4) ^ crcTable[(crc_final ^ (data >> 0)) & 0x0F];  //lower
+		crc_final = (crc_final >> 4) ^ crcTable[(crc_final ^ (data >> 4)) & 0x0F];	 //upper
+	}
+}
+
+void crc_check (u8 data)
+{
+	unsigned int n;
+	static int num_1=1;
+	static u8 crc=0;
+	for (n=0;n<sizeof(data);n++)
+	{
+		crc_rec = (crc_rec >> 4) ^ crcTable[(crc_rec ^ (data >> 0)) & 0x0F];  //lower
+		crc_rec = (crc_rec >> 4) ^ crcTable[(crc_rec ^ (data >> 4)) & 0x0F];	 //upper
+	}
+
+	if (num_1==65)
+	{
+		if (crc_rec==0)
+		{
+			flag_rc=3; //send ack 1
+			xil_printf("TRUE TRANSMITION");
+		}
+		else
+		{
+			flag_rc=4;
+			xil_printf("FALSE TRANSMITION  %X\r\n",crc_rec);
+		}
+		num_1=0;
+	}
+	num_1++;
+}
+
+void reset_stats()
+{
+	int t;
+    Rd_TB=0;
+    Wr_TB=11;
+    Rd_RB=0;
+    Wr_RB=0;
+	for (t=0;t<8;t++)
+	{
+		TB[t]=0xAA;
+	}
+	TB[8]=0x03;
+	TB[9]=0x35;
+	TB[10]=0x44;
+	if(rec_ack==1)
+	{
+		*rts_1 = 0x00;
+		rec_ack=2;
+		flag_rc=2;
+	}
+	else if(rec_ack==0)
+	{
+		*rts_1 = 0x01;
+		rec_ack=2;
+		flag_rc=2;
+	}
+
+}

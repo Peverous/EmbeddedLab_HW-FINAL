@@ -1,0 +1,10 @@
+#-----------------------------------------------------------
+# Webtalk v2014.4 (64-bit)
+# SW Build 1071353 on Tue Nov 18 18:29:27 MST 2014
+# 
+# Start of session at: Mon Dec 14 12:31:44 2015
+# Process ID: 3580
+# Log file: D:/STELIOS/COMES/Embedded_LAB/2015/EmbeddedLab_HW_2014_4/EmbeddedLab_HW_2014_4.sdk/webtalk/webtalk.log
+# Journal file: D:/STELIOS/COMES/Embedded_LAB/2015/EmbeddedLab_HW_2014_4/EmbeddedLab_HW_2014_4.sdk/webtalk\webtalk.jou
+#-----------------------------------------------------------
+source sdk_webtalk.tcl

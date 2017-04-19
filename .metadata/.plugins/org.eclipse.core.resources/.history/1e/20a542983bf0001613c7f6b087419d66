@@ -1,0 +1,34 @@
+/*
+ * crc.c
+ *
+ *  Created on: Feb 11, 2017
+ *      Author: chris
+ */
+
+#include "crc.h"
+#include <stdlib.h>
+
+void crc_init() {
+	unsigned long remainder;
+	// Compute the remainder of each possible dividend
+	for (int dividend = 0; dividend < 256; ++dividend)
+	{
+		// Start with the dividend followed by zeros
+		remainder = dividend << (WIDTH - 8);
+
+		// Perform modulo-2 division, a bit at a time
+		for (unsigned long bit = 8; bit > 0; --bit)
+		{
+			// Try to divide the current data bit
+			if (remainder & TOPBIT) {
+				remainder = (remainder << 1) ^ POLYNOMIAL;
+			}
+			else
+			{
+				remainder = (remainder << 1);
+			}
+		}
+		crcTable[dividend] = remainder;
+	}
+}
+

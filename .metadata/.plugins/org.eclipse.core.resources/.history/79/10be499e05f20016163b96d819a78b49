@@ -1,0 +1,78 @@
+/*
+ * crc.c
+ *
+ *  Created on: Feb 11, 2017
+ *      Author: chris
+ */
+
+#include "crc.h"
+#include "Timer.h"
+#include "Interrupts.h"
+#include "UART.h"
+
+unsigned long crcTable[256];
+void crc_init() {
+	unsigned long remainder;
+	int dividend;
+	unsigned long bit;
+
+	for ( dividend = 0; dividend < 256; ++dividend)
+	{
+
+		remainder = dividend << (WIDTH - 8);
+
+
+		for ( bit = 8; bit > 0; --bit)
+		{
+			if (remainder & TOPBIT) {
+				remainder = (remainder << 1) ^ CRC_POLY;
+			}
+			else
+			{
+				remainder = (remainder << 1);
+			}
+		}
+		crcTable[dividend] = remainder;
+	}
+}
+
+void cacl_crc(u8 data)
+{
+	unsigned int n;
+	static int num=1;
+	static unsigned int crc;
+	for (n=0;n<8*sizeof(data);n++)
+	{
+		crc = (crc >> 4) ^ crcTable[(crc ^ (data >> 0)) & 0x0F];  //lower
+		crc = (crc >> 4) ^ crcTable[(crc ^ (data >> 4)) & 0x0F];	 //upper
+	}
+
+	if (num==68)
+	{
+		crc_final=crc;
+		num=0;
+	}
+	num++;
+}
+
+void crc_check (u8 data)
+{
+	unsigned int n;
+	static int num_1=1;
+	static unsigned int crc;
+	for (n=0;n<8*sizeof(data);n++)
+	{
+		crc = (crc >> 4) ^ crcTable[(crc ^ (data >> 0)) & 0x0F];  //lower
+		crc = (crc >> 4) ^ crcTable[(crc ^ (data >> 4)) & 0x0F];	 //upper
+	}
+
+	if (num_1==71)
+	{
+		if (crc==0)
+			flag_rc=3; //send ack 1
+		else
+			flag_rc=4;
+		num_1=0;
+	}
+	num_1++;
+}

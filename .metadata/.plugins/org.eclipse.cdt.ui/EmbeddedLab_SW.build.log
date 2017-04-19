@@ -1,0 +1,6 @@
+15:02:24 **** Incremental Build of configuration Debug for project EmbeddedLab_SW ****
+make all 
+make: Nothing to be done for `all'.
+
+15:02:24 Build Finished (took 249ms)
+

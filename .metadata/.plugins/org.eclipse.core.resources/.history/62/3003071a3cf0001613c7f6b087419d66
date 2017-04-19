@@ -1,0 +1,23 @@
+/*
+ * crc.h
+ *
+ *  Created on: Feb 11, 2017
+ *      Author: chris
+ */
+
+#ifndef CRC_H_
+#define CRC_H_
+
+
+#include "Defs.h"
+#define CRC_POLY  0x04C11DB7
+#define WIDTH 8*(sizeof(CRC_POLY))
+#define TOPBIT 1<<(WIDTH-1)
+
+unsigned long crcTable[256];
+
+void crc_init();
+
+
+
+#endif /* CRC_H_ */
